@@ -11,10 +11,11 @@ using namespace TobiiGameIntegration;
 HWND GetConsoleHwnd(void); // See SampleHelpFunctions.cpp
 
 #pragma region UserDefinedConfig
-static constexpr float k_maxYawIRL = 40.0f;
-static constexpr float k_maxPitchIRL = 15.0f;
+static constexpr float k_maxYawIRL = 50.0f;
+static constexpr float k_maxPitchIRL = 30.0f;
 static constexpr float k_deadYawIRL = 5.0f;
-static constexpr float k_deadPitchIRL = 5.0f;
+static constexpr float k_deadPitchIRL = 7.5f;
+static constexpr bool k_addControllerStickInput = false;
 
 static std::pair<float, float> IRLYawPitchToControllerStick(float irlYaw, float irlPitch)
 {
@@ -143,8 +144,11 @@ int main()
             "Pos(mm) [X: " << trans.Position.X << ",Y: " << trans.Position.Y << ",Z: " << trans.Position.Z << "]          \r";
 
         auto [yaw, pitch] = IRLYawPitchToControllerStick(trans.Rotation.YawDegrees, trans.Rotation.PitchDegrees);
-        yaw += static_cast<float>(inputState.Gamepad.sThumbRX) / 32767.0f;
-        pitch += static_cast<float>(inputState.Gamepad.sThumbRY) / 32767.0f;
+        if (k_addControllerStickInput)
+        {
+            yaw += static_cast<float>(inputState.Gamepad.sThumbRX) / 32767.0f;
+            pitch += static_cast<float>(inputState.Gamepad.sThumbRY) / 32767.0f;
+        }
         yaw = std::clamp(yaw, -1.0f, 1.0f);
         pitch = std::clamp(pitch, -1.0f, 1.0f);
         float magnitude = std::sqrt(yaw * yaw + pitch * pitch);
